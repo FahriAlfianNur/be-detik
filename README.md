@@ -1,59 +1,350 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Detik Test - Laravel API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi Laravel untuk manajemen produk dengan fitur import CSV dan autentikasi menggunakan Laravel Sanctum.
 
-## About Laravel
+## Persyaratan Sistem
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP >= 8.2
+- Composer
+- PostgreSQL >= 12
+- Git
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Cara Instalasi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Clone Repository
 
-## Learning Laravel
+```bash
+git clone https://github.com/FahriAlfianNur/be-detik.git
+cd be-detik
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 2. Install Dependencies
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+composer install
+```
 
-## Laravel Sponsors
+### 3. Konfigurasi Environment
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Copy file `.env.example` menjadi `.env`:
 
-### Premium Partners
+```bash
+cp .env.example .env
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 4. Konfigurasi Database PostgreSQL
 
-## Contributing
+Edit file `.env` dan sesuaikan konfigurasi database PostgreSQL:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=nama_database
+DB_USERNAME=username_postgresql
+DB_PASSWORD=password_postgresql
+```
 
-## Code of Conduct
+**Catatan:** Pastikan Anda sudah membuat database di PostgreSQL sebelum melanjutkan.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5. Generate Application Key
 
-## Security Vulnerabilities
+```bash
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 6. Jalankan Migration
 
-## License
+```bash
+php artisan migrate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 7. Jalankan Queue Worker (Terminal Terpisah)
+
+Aplikasi ini menggunakan queue untuk memproses import CSV. Jalankan worker di terminal terpisah:
+
+```bash
+php artisan queue:work
+```
+
+### 8. Jalankan Development Server
+
+```bash
+php artisan serve
+```
+
+Aplikasi akan berjalan di `http://localhost:8000`
+
+## Dokumentasi API
+
+Base URL: `http://localhost:8000/api`
+
+### 1. Register User
+
+Endpoint untuk mendaftarkan user baru sebelum menggunakan aplikasi.
+
+**Endpoint:** `POST /api/register`
+
+**Request Body:**
+```json
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+}
+```
+
+**Response Success (201):**
+```json
+{
+    "message": "User registered successfully",
+    "user": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com",
+        "created_at": "2025-12-12T07:11:49.000000Z",
+        "updated_at": "2025-12-12T07:11:49.000000Z"
+    },
+    "token": "1|abcdefghijklmnopqrstuvwxyz1234567890"
+}
+```
+
+**Contoh Request (cURL):**
+```bash
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+  }'
+```
+
+---
+
+### 2. Login
+
+Endpoint untuk login dan mendapatkan token autentikasi.
+
+**Endpoint:** `POST /api/login`
+
+**Request Body:**
+```json
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+```
+
+**Response Success (200):**
+```json
+{
+    "message": "Login successful",
+    "user": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com",
+        "created_at": "2025-12-12T07:11:49.000000Z",
+        "updated_at": "2025-12-12T07:11:49.000000Z"
+    },
+    "token": "2|abcdefghijklmnopqrstuvwxyz1234567890"
+}
+```
+
+**Response Error (401):**
+```json
+{
+    "message": "Invalid credentials"
+}
+```
+
+**Contoh Request (cURL):**
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+```
+
+---
+
+### 3. Get User Profile
+
+Endpoint untuk mendapatkan informasi user yang sedang login.
+
+**Endpoint:** `GET /api/user`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+**Response Success (200):**
+```json
+{
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "created_at": "2025-12-12T07:11:49.000000Z",
+    "updated_at": "2025-12-12T07:11:49.000000Z"
+}
+```
+
+**Contoh Request (cURL):**
+```bash
+curl -X GET http://localhost:8000/api/user \
+  -H "Authorization: Bearer {your_token_here}" \
+  -H "Accept: application/json"
+```
+
+---
+
+### 4. Import Products (CSV)
+
+Endpoint untuk mengupload file CSV dan mengimport produk ke database.
+
+**Endpoint:** `POST /api/import`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+Accept: application/json
+```
+
+**Request Body (Form Data):**
+- `file`: File CSV (required)
+
+**Format CSV:**
+```csv
+name,sku,price,stock
+Product 1,SKU0001,10000,100
+Product 2,SKU0002,20000,50
+```
+
+**Response Success (200):**
+```json
+{
+    "message": "Import job has been queued",
+    "job_id": "abc123-def456-ghi789",
+    "status": "pending"
+}
+```
+
+**Response Error (422):**
+```json
+{
+    "message": "The file field is required.",
+    "errors": {
+        "file": [
+            "The file field is required."
+        ]
+    }
+}
+```
+
+**Contoh Request (cURL):**
+```bash
+curl -X POST http://localhost:8000/api/import \
+  -H "Authorization: Bearer {your_token_here}" \
+  -H "Accept: application/json" \
+  -F "file=@/path/to/your/products.csv"
+```
+
+---
+
+### 5. Check Import Status
+
+Endpoint untuk mengecek status proses import berdasarkan job ID.
+
+**Endpoint:** `GET /api/import/status/{id}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+**Response Success (200):**
+```json
+{
+    "job_id": "abc123-def456-ghi789",
+    "status": "completed",
+    "total": 100,
+    "success": 95,
+    "failed": 5,
+    "created_at": "2025-12-11T18:00:25.000000Z",
+    "updated_at": "2025-12-11T18:00:50.000000Z"
+}
+```
+
+**Status yang mungkin:**
+- `pending`: Import sedang menunggu diproses
+- `in_progress`: Import sedang diproses
+- `completed`: Import selesai
+- `failed`: Import gagal
+
+**Contoh Request (cURL):**
+```bash
+curl -X GET http://localhost:8000/api/import/status/abc123-def456-ghi789 \
+  -H "Authorization: Bearer {your_token_here}" \
+  -H "Accept: application/json"
+```
+
+---
+
+### 6. Logout
+
+Endpoint untuk logout dan menghapus token autentikasi.
+
+**Endpoint:** `POST /api/logout`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+**Response Success (200):**
+```json
+{
+    "message": "Logged out successfully"
+}
+```
+
+**Contoh Request (cURL):**
+```bash
+curl -X POST http://localhost:8000/api/logout \
+  -H "Authorization: Bearer {your_token_here}" \
+  -H "Accept: application/json"
+```
+
+---
+
+## Catatan
+
+1. **Autentikasi**: Semua endpoint kecuali `/register` dan `/login` memerlukan token autentikasi di header `Authorization: Bearer {token}`
+2. **Queue Worker**: Pastikan queue worker berjalan untuk memproses import CSV
+3. **Database**: Aplikasi ini menggunakan PostgreSQL sebagai database
+4. **Token**: Simpan token yang didapat dari endpoint register/login untuk digunakan di request selanjutnya
+
+## Troubleshooting
+
+### Queue tidak berjalan
+Pastikan queue worker sudah dijalankan dengan perintah:
+```bash
+php artisan queue:work
+```
+
+### Error koneksi database
+Periksa konfigurasi database di file `.env` dan pastikan PostgreSQL sudah berjalan.
+
+### Token tidak valid
+Pastikan token yang digunakan masih valid dan belum dihapus (logout).
